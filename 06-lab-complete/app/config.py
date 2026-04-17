@@ -34,7 +34,7 @@ class Settings:
 
     # Budget
     daily_budget_usd: float = field(
-        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "5.0"))
+        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "1.0"))
     )
 
     # Storage
