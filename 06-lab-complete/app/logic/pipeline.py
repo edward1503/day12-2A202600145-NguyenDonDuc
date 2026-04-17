@@ -78,16 +78,8 @@ Respond in JSON format: {{"safety": score, "relevance": score, "accuracy": score
             return {"error": str(e), "verdict": "FAIL"}
 
 class DefensePipeline:
-    def __init__(self):
-        if settings.openai_api_key:
-            from openai import OpenAI
-            self.client = OpenAI(api_key=settings.openai_api_key)
-            self.is_mock = False
-        else:
-            self.client = None
-            self.is_mock = True
-            logger.warning("OPENAI_API_KEY not set — Pipeline will use Mock LLM")
-            
+        from openai import OpenAI
+        self.client = OpenAI(api_key=settings.openai_api_key)
         self.model = settings.llm_model
         self.input_guard = InputGuardrail()
         self.output_guard = OutputGuardrail()
@@ -110,18 +102,14 @@ class DefensePipeline:
 
         # 2. LLM Generation
         try:
-            if self.is_mock:
-                from utils.mock_llm import ask as mock_ask
-                raw_response = mock_ask(query)
-            else:
-                res = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {"role": "system", "content": "You are a VinBank assistant. Provide helpful banking advice. Stay on topic."},
-                        {"role": "user", "content": query}
-                    ]
-                )
-                raw_response = res.choices[0].message.content
+            res = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a VinBank assistant. Provide helpful banking advice. Stay on topic."},
+                    {"role": "user", "content": query}
+                ]
+            )
+            raw_response = res.choices[0].message.content
         except Exception as e:
             logger.error(f"LLM generation error: {e}")
             msg = "System error during generation."
