@@ -31,8 +31,15 @@ import uvicorn
 
 from app.config import settings
 
-# Mock LLM (thay bằng OpenAI/Anthropic khi có API key)
+# Mock LLM
 from utils.mock_llm import ask as llm_ask
+
+# OpenAI Integration
+try:
+    from openai import OpenAI
+    openai_client = OpenAI(api_key=settings.openai_api_key) if settings.openai_api_key else None
+except ImportError:
+    openai_client = None
 
 # ─────────────────────────────────────────────────────────
 # Logging — JSON structured
@@ -212,9 +219,22 @@ async def ask_agent(
         "event": "agent_call",
         "q_len": len(body.question),
         "client": str(request.client.host) if request.client else "unknown",
+        "engine": "openai" if openai_client else "mock"
     }))
 
-    answer = llm_ask(body.question)
+    if openai_client:
+        try:
+            response = openai_client.chat.completions.create(
+                model=settings.llm_model,
+                messages=[{"role": "user", "content": body.question}],
+                max_tokens=500
+            )
+            answer = response.choices[0].message.content
+        except Exception as e:
+            logger.error(f"OpenAI error: {str(e)} - falling back to mock")
+            answer = llm_ask(body.question)
+    else:
+        answer = llm_ask(body.question)
 
     output_tokens = len(answer.split()) * 2
     check_and_record_cost(0, output_tokens)
