@@ -1,109 +1,53 @@
-# Day 12 — Deployment: Đưa Agent Lên Cloud
+# VinBank AI Agent — Production Deployment Report 🚀
 
-> **AICB-P1 · VinUniversity 2026**  
-> Repository thực hành đi kèm bài giảng Day 12.  
-> Mỗi phần có ví dụ **cơ bản** (hiểu concept) và **chuyên sâu** (production-ready).
+Dự án này đánh dấu việc hoàn thiện một hệ thống AI Agent đạt chuẩn **Production-Ready**, được thiết kế để hoạt động ổn định, bảo mật và tiết kiệm chi phí khi triển khai trên các môi trường Cloud như **Railway**.
 
 ---
 
-## Cấu Trúc Project
+## 🛠️ Những Thành Phần Đã Triển Khai
 
-```
-day12_ha-tang-cloud_va_deployment/
-├── 01-localhost-vs-production/     # Section 1: Dev ≠ Production
-│   ├── develop/                      #   Agent "đúng kiểu localhost"
-│   └── production/                   #   12-Factor compliant agent
-│
-├── 02-docker/                      # Section 2: Containerization
-│   ├── develop/                      #   Dockerfile đơn giản
-│   └── production/                   #   Multi-stage + Docker Compose stack
-│
-├── 03-cloud-deployment/            # Section 3: Cloud Options
-│   ├── railway/                    #   Deploy Railway (< 5 phút)
-│   ├── render/                     #   Deploy Render + render.yaml
-│   └── production-cloud-run/         #   GCP Cloud Run + CI/CD
-│
-├── 04-api-gateway/                 # Section 4: Security
-│   ├── develop/                      #   API Key authentication
-│   └── production/                   #   JWT + Rate Limiting + Cost Guard
-│
-├── 05-scaling-reliability/         # Section 5: Scale & Reliability
-│   ├── develop/                      #   Health check + graceful shutdown
-│   └── production/                   #   Stateless + Redis + Nginx LB
-│
-├── 06-lab-complete/                # Lab 12: Production-ready agent
-│   └── (full project kết hợp tất cả)
-│
-└── utils/                          # Mock LLM dùng chung (không cần API key)
-```
+Trong dự án này, tui đã xây dựng và tích hợp thành công các thành phần cốt lõi sau:
+
+### 1. Hệ Thống Bảo Vệ Đa Lớp (Defense Pipeline)
+Thay vì gọi LLM trực tiếp, mọi yêu cầu đều phải đi qua một Pipeline bảo mật bao gồm:
+*   **Input Guardrail:** Tự động phát hiện và ngăn chặn các kỹ thuật **Prompt Injection** (ví dụ: yêu cầu bot quên chỉ dẫn cũ hoặc tiết lộ mã hệ thống).
+*   **Output Guardrail (PII Filtering):** Quét câu trả lời của AI để ẩn các thông tin nhạy cảm như Số điện thoại, Email, giúp bảo vệ quyền riêng tư của khách hàng.
+
+### 2. Quản Trị Vận Hành (Ops & Scaling)
+Để đưa lên Railway một cách chuyên nghiệp, dự án đã áp dụng các kỹ thuật:
+*   **Redis Rate Limiting:** Sử dụng Redis để quản lý lưu lượng truy cập. Ngăn chặn các cuộc tấn công SPAM hoặc DoS làm treo hệ thống.
+*   **Token-based Cost Guard:** Cơ chế "cầu chì" thông minh giúp kiểm soát ví tiền OpenAI. Hệ thống tự động ngắt kết nối khi chi phí trong ngày chạm ngưỡng **$1.0**, tránh rủi ro mất tiền ngoài ý muốn.
+*   **Structured Logging:** Lưu log dưới dạng JSON chuẩn, giúp dễ dàng theo dõi lỗi và hành vi của người dùng trên Dashboard của Railway.
+
+### 3. Trải Nghiệm Người Dùng (Frontend UI)
+Giao diện không chỉ đẹp mà còn mang tính ứng dụng cao:
+*   **Real-time Metrics:** Hiển thị độ trễ (Latency), tổng số yêu cầu và chi tiêu thực tế.
+*   **Security Audit Log:** Cho phép "soi" chi tiết từng lớp bảo vệ đã xử lý yêu cầu như thế nào, giúp tăng tính minh bạch của hệ thống.
 
 ---
 
-## 🚀 Bắt Đầu Nhanh
+## 🌟 Điểm Nổi Bật Của Hệ Thống
 
-**Muốn thử ngay?** → [QUICK_START.md](QUICK_START.md) (5 phút)
-
-**Muốn học kỹ?** → [CODE_LAB.md](CODE_LAB.md) (3-4 giờ)
-
-## Cách Học
-
-| Bước | Làm gì |
-|------|--------|
-| 0 | **[Khuyến nghị]** Đọc [QUICK_START.md](QUICK_START.md) để thử nhanh |
-| 1 | Đọc [CODE_LAB.md](CODE_LAB.md) để hiểu chi tiết |
-| 2 | Chạy ví dụ **basic** trước — hiểu concept |
-| 3 | So sánh với ví dụ **advanced** — thấy sự khác biệt |
-| 4 | Tự làm Lab 06 từ đầu trước khi xem solution |
-| 5 | Tham khảo [QUICK_REFERENCE.md](QUICK_REFERENCE.md) khi cần |
-| 6 | Xem [TROUBLESHOOTING.md](TROUBLESHOOTING.md) khi gặp lỗi |
+*   **Đạt chuẩn Production Ready:** Vượt qua toàn bộ các bài kiểm tra về Dockerfile (Multi-stage), Healthcheck, Liveness/Readiness probe, và Graceful Shutdown.
+*   **Tối Ưu Cloud (Railway-Native):** Cấu hình `railway.toml` và Docker được tinh chỉnh để tận dụng tối đa hạ tầng của Railway, cho phép triển khai chỉ trong vài phút.
+*   **Tiết Kiệm & An Toàn:** Cơ chế chặn budget cứng ($1/ngày) là điểm nhấn quan trọng giúp nhà phát triển yên tâm khi public chatbot ra môi trường internet.
+*   **Xử Lý Tiếng Việt Chuẩn:** Hệ thống streaming và parse JSON được tinh chỉnh để hiển thị font tiếng Việt mượt mà, không lỗi Unicode.
 
 ---
 
-## Yêu Cầu
+## 🚀 Hướng Dẫn Chạy & Cấu Hình
 
+### Chạy Local (Docker)
+Sử dụng Docker Compose để chạy cả App và Redis:
 ```bash
-python 3.11+
-docker & docker compose
+docker compose up --build
 ```
 
-Mỗi folder có `requirements.txt` riêng. Không cần API key thật — các ví dụ dùng **mock LLM** để chạy offline.
+### Triển Khai Railway
+Hệ thống đã sẵn sàng 100%. Các biến cần cấu hình trên Railway:
+*   `OPENAI_API_KEY`: Key từ OpenAI.
+*   `AGENT_API_KEY`: Chìa khóa bảo mật cho Agent (ví dụ: `your-secret-key-123`).
+*   `REDIS_URL`: URL kết nối tới dịch vụ Redis trên Railway.
 
 ---
-
-## Sections
-
-| # | Folder | Concept chính |
-|---|--------|--------------|
-| 1 | `01-localhost-vs-production` | Dev/prod gap, 12-factor, secrets |
-| 2 | `02-docker` | Dockerfile, multi-stage, docker-compose |
-| 3 | `03-cloud-deployment` | Railway, Render, Cloud Run |
-| 4 | `04-api-gateway` | Auth, rate limiting, cost protection |
-| 5 | `05-scaling-reliability` | Health check, stateless, rolling deploy |
-| 6 | `06-lab-complete` | **Full production agent** |
-
----
-
-## 📚 Lab Materials
-
-Chúng tôi đã chuẩn bị đầy đủ tài liệu hướng dẫn:
-
-### Cho Sinh Viên
-
-| Tài liệu | Mô tả | Thời gian |
-|----------|-------|-----------|
-| **[CODE_LAB.md](CODE_LAB.md)** | Hướng dẫn lab chi tiết từng bước | 3-4 giờ |
-| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | Cheat sheet các lệnh và patterns | Tra cứu |
-| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | Giải quyết lỗi thường gặp | Khi cần |
-
-### Cho Giảng Viên
-
-| Tài liệu | Mô tả |
-|----------|-------|
-| **[INSTRUCTOR_GUIDE.md](INSTRUCTOR_GUIDE.md)** | Hướng dẫn chấm điểm và đánh giá |
-
-### Cách Sử Dụng
-
-1. **Trước lab:** Đọc [CODE_LAB.md](CODE_LAB.md) để hiểu tổng quan
-2. **Trong lab:** Làm theo từng Part, tham khảo [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
-3. **Gặp lỗi:** Xem [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
-4. **Sau lab:** Nộp Part 6 Final Project để chấm điểm
+*Dự án hoàn thiện bởi **Nguyễn Đôn Đức** — Một giải pháp AI Agent an toàn và tin cậy cho VinBank.*
