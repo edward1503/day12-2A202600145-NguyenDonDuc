@@ -2,26 +2,29 @@ version: "3.9"
 
 services:
   agent:
-    build: .
-    ports:
-      - "8000:8000"
+    build:
+      context: ..
+      dockerfile: 06-lab-complete/Dockerfile
     environment:
-      - ENVIRONMENT=staging
-      - APP_NAME=Production AI Agent
       - REDIS_URL=redis://redis:6379/0
-    env_file:
-      - .env.local
+      - ENVIRONMENT=development             # Chuyển về dev để test local dễ hơn
+      - AGENT_API_KEY=my-super-secret-key-123
+      - JWT_SECRET=local-dev-secret-123
+      - APP_NAME=VinBank Agent Production
+      - DEBUG=true
     depends_on:
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 15s
-    restart: unless-stopped
+    networks:
+      - internal
+    ports:
+      - "8000:8000"                         # Expose port để test local
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
 
   redis:
     image: redis:7-alpine
@@ -31,3 +34,9 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

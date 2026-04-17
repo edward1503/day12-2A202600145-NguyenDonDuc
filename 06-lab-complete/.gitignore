@@ -1,0 +1,15 @@
+# 06-lab-complete/.gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+.git/
+*.md
+.DS_Store
+.vscode/
+.idea/
+*.log

@@ -13,8 +13,8 @@ class Settings:
     debug: bool = field(default_factory=lambda: os.getenv("DEBUG", "false").lower() == "true")
 
     # App
-    app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "Production AI Agent"))
-    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.0"))
+    app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "VinBank Production Agent"))
+    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "2.0.0"))
 
     # LLM
     openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
@@ -29,16 +29,31 @@ class Settings:
 
     # Rate limiting
     rate_limit_per_minute: int = field(
-        default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "20"))
+        default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "10"))
     )
 
     # Budget
     daily_budget_usd: float = field(
-        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "5.0"))
+        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "10.0"))
     )
 
     # Storage
-    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", ""))
+    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+
+    # Banking Pipeline specific
+    allowed_topics: list = field(
+        default_factory=lambda: [
+            "banking", "account", "transaction", "transfer",
+            "loan", "interest", "savings", "credit",
+            "deposit", "withdrawal", "balance", "payment",
+            "tai khoan", "giao dich", "tiet kiem", "lai suat",
+            "chuyen tien", "the tin dung", "so du", "vay",
+            "ngan bank", "atm"
+        ]
+    )
+    blocked_topics: list = field(
+        default_factory=lambda: ["hack", "exploit", "weapon", "drug", "illegal", "violence"]
+    )
 
     def validate(self):
         logger = logging.getLogger(__name__)
