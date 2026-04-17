@@ -10,6 +10,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 import uvicorn
 
@@ -76,6 +78,9 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "X-API-Key"],
 )
 
+# Mount static files (UI)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.middleware("http")
 async def request_middleware(request: Request, call_next):
     global _request_count
@@ -112,7 +117,7 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     session_id: str
     question: str
-    answer: str
+    response: str  # Updated to match JS expectation
     metadata: dict
     timestamp: str
 
@@ -122,43 +127,63 @@ class AskResponse(BaseModel):
 
 @app.get("/")
 def root():
-    return {"app": settings.app_name, "status": "running"}
+    """Redirect to the UI by default."""
+    return RedirectResponse(url="/static/index.html")
 
-@app.post("/ask", response_model=AskResponse)
-async def ask_agent(
-    body: AskRequest,
+@app.get("/api/metrics")
+def get_api_metrics(_key: str = Depends(verify_api_key)):
+    """Metrics for the UI."""
+    return _pipeline.get_metrics()
+
+@app.get("/api/audit")
+def get_api_audit(_key: str = Depends(verify_api_key)):
+    """Audit logs for the UI."""
+    return _pipeline.audit_log
+
+@app.post("/api/chat", response_model=AskResponse)
+async def chat_agent(
+    body: dict, # UI sends {user_id, message}
     _key: str = Depends(verify_api_key),
 ):
     """
-    Main endpoint for the banking defense agent.
-    - Requires X-API-Key
-    - Features: Rate limiting, Cost tracking, Input/Output Guardrails, LLM Evaluation.
+    UI-compatible chat endpoint.
     """
     if not _is_ready:
         raise HTTPException(503, "Service not ready")
 
-    # 1. Rate Limiting (Stateless via Redis)
+    user_id = body.get("user_id", "unknown")
+    question = body.get("message", "")
+
+    # 1. Rate Limiting
     check_rate_limit(_key)
 
-    # 2. Daily Budget Guard (Stateless via Redis)
-    # Estimate tokens: 1 word ≈ 2 tokens
-    input_tokens = len(body.question.split()) * 2
+    # 2. Daily Budget Guard
+    input_tokens = len(question.split()) * 2
     check_and_record_cost(input_tokens, 0)
 
     # 3. Process via Defense Pipeline
-    answer, log_metadata = await _pipeline.process_query(body.user_id, body.question)
+    answer, log_metadata = await _pipeline.process_query(user_id, question)
 
     # 4. Record output cost
     output_tokens = len(answer.split()) * 2
     check_and_record_cost(0, output_tokens)
 
     return AskResponse(
-        session_id=body.user_id,
-        question=body.question,
-        answer=answer,
+        session_id=user_id,
+        question=question,
+        response=answer,
         metadata=log_metadata,
         timestamp=datetime.now(timezone.utc).isoformat()
     )
+
+@app.post("/ask", response_model=AskResponse)
+async def ask_agent(
+    body: AskRequest,
+    _key: str = Depends(verify_api_key),
+):
+    # (Legacy/CLI compatible endpoint)
+    res = await chat_agent({"user_id": body.user_id, "message": body.question}, _key)
+    return res
 
 @app.get("/health")
 def health():

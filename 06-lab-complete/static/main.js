@@ -18,6 +18,7 @@ const modal = document.getElementById('modal');
 const modalJson = document.getElementById('modal-json');
 const closeModal = document.querySelector('.close-modal');
 
+const AGENT_API_KEY = "my-super-secret-key-123";
 let userId = "user_" + Math.floor(Math.random() * 10000);
 
 // Init
@@ -46,7 +47,10 @@ async function sendMessage(text) {
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-API-Key': AGENT_API_KEY
+            },
             body: JSON.stringify({ user_id: userId, message: text })
         });
         
@@ -92,7 +96,9 @@ function appendMessage(text, type, meta = null) {
 
 async function updateMetrics() {
     try {
-        const res = await fetch('/api/metrics');
+        const res = await fetch('/api/metrics', {
+            headers: { 'X-API-Key': AGENT_API_KEY }
+        });
         const data = await res.json();
         
         mTotal.innerText = data.total_requests;
@@ -111,7 +117,9 @@ async function updateMetrics() {
 
 async function updateAudit() {
     try {
-        const res = await fetch('/api/audit');
+        const res = await fetch('/api/audit', {
+            headers: { 'X-API-Key': AGENT_API_KEY }
+        });
         const logs = await res.json();
         
         auditList.innerHTML = '';
