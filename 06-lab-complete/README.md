@@ -44,20 +44,24 @@ Kết hợp TẤT CẢ những gì đã học trong 1 project hoàn chỉnh.
 
 ```bash
 # 1. Setup
-cp .env.example .env
+# Phải đảm bảo có folder utils/mock_llm.py (đã được tạo tự động)
+cp .env.example .env.local
 
 # 2. Chạy với Docker Compose
-docker compose up
+docker compose up --build
 
-# 3. Test
-curl http://localhost/health
+# 3. Test công khai
+curl http://localhost:8000/health
 
-# 4. Lấy API key từ .env, test endpoint
-API_KEY=$(grep AGENT_API_KEY .env | cut -d= -f2)
-curl -H "X-API-Key: $API_KEY" \
-     -X POST http://localhost/ask \
+# 4. Test API với Key (mặc định trong .env.local là lab6-secret-key-123)
+curl -H "X-API-Key: lab6-secret-key-123" \
+     -X POST http://localhost:8000/ask \
      -H "Content-Type: application/json" \
      -d '{"question": "What is deployment?"}'
+
+# Hoặc dùng script test có sẵn:
+# Windows: ./test_api.ps1
+# Mac/Linux: bash test_api.sh
 ```
 
 ---
