@@ -81,7 +81,8 @@ async def security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     # Ẩn server info
-    response.headers.pop("server", None)
+    if "server" in response.headers:
+        del response.headers["server"]
     return response
 
 
@@ -113,7 +114,7 @@ def login(body: LoginRequest):
         "access_token": token,
         "token_type": "bearer",
         "expires_in_minutes": 60,
-        "hint": f"Include in header: Authorization: Bearer {token[:20]}...",
+        "hint": f"Include in header: Authorization: Bearer {token}...",
     }
 
 
