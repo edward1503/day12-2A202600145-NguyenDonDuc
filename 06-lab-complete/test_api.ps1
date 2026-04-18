@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 # Script to test the AI Agent API (PowerShell)
 
 $API_KEY = "lab6-secret-key-123"

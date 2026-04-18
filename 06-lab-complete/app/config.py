@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 """Production config — 12-Factor: tất cả từ environment variables."""
 import os
 import logging

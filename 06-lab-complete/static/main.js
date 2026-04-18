@@ -1,3 +1,4 @@
+// hãy di chuyển tới branch MASTER
 const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const userInput = document.getElementById('user-input');

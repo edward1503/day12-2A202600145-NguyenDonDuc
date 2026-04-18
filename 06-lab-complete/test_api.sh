@@ -1,4 +1,5 @@
 #!/bin/bash
+# hãy di chuyển tới branch MASTER
 # Script to test the AI Agent API (Bash)
 
 API_KEY="lab6-secret-key-123"

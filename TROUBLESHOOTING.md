@@ -1,3 +1,4 @@
+hãy di chuyển tới branch MASTER
 # 🔧 Troubleshooting Guide
 
 > Giải quyết các vấn đề thường gặp trong Day 12 Lab

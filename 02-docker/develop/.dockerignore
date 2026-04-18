@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 # Không copy những file này vào Docker image
 # Lý do: giảm context size, tăng security
 

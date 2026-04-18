@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 # ============================================================
 # BASIC Dockerfile — Single-stage, dễ đọc, dễ hiểu
 # Dùng làm điểm khởi đầu trước khi học multi-stage

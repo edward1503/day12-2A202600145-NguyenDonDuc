@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 # 05-scaling-reliability/production/Dockerfile
 FROM python:3.11-slim
 

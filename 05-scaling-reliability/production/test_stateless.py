@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 """
 Test script: Chứng minh stateless agent hoạt động đúng khi scale.
 

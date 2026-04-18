@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 """
 ❌ BASIC — Agent "Kiểu Localhost" (Anti-patterns)
 

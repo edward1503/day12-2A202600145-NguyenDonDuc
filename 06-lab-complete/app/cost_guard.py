@@ -1,3 +1,4 @@
+# hãy di chuyển tới branch MASTER
 import time
 import redis
 import logging
